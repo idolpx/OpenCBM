@@ -38,6 +38,10 @@ libopencbmtransfer_set_transfer(opencbm_transfer_t TransferType)
         current_transfer_funcs = &libopencbmtransfer_s2;
         break;
 
+    case opencbm_transfer_srq_handshaked:
+        current_transfer_funcs = &libopencbmtransfer_srq;
+        break;
+
     case opencbm_transfer_parallel:
         current_transfer_funcs = &libopencbmtransfer_pp;
         break;

@@ -9,12 +9,14 @@ LIB     = libtrans.a
 SRCS    = pp.c \
 	  s1.c \
 	  s2.c \
+	  srq.c \
 	  turbo.c
 
 INCS    = pp1541.inc \
 	  pp1571.inc \
 	  s1.inc \
 	  s2.inc \
+	  srq1571.inc \
           turbomain.inc
 
 OBJS    = $(SRCS:.c=.lo)
@@ -37,11 +39,15 @@ pp1541.inc: pp1541.a65 common.i65
 
 pp1571.inc: pp1571.a65 common.i65
 
+srq1571.inc: srq1571.a65 common.i65
+
 s1.lo: s1.c s1.inc
 
 s2.lo: s2.c s2.inc
 
 pp.lo: pp.c pp1541.inc pp1571.inc
+
+srq.lo: srq.c srq1571.inc
 
 turbo.lo: turbomain.inc
 

@@ -37,13 +37,45 @@
 
 .elseif .defined(Drive1571)
 
+        VIA_BC_BASE = $1800
+        VIA_BC_PA_NOHANDSHAKE = $180F
+
         IEC_PORT   = $1800
-        PP_DATA    = $4001
-        PP_DDR     = $4003
+
+        CIA_BASE   = $4000
+        CIA_PA     = CIA_BASE
+        CIA_PB     = CIA_BASE+1
+        CIA_DDRA   = CIA_BASE+2
+        CIA_DDRB   = CIA_BASE+3
+        CIA_TA_LO  = CIA_BASE+4
+        CIA_TA_HI  = CIA_BASE+5
+        CIA_SDR    = CIA_BASE+$c
+        CIA_ICR    = CIA_BASE+$d
+        CIA_CRA    = CIA_BASE+$e
+
+        VIA_BC_PA_TRACK0        = $01
+        VIA_BC_PA_SRQ_AS_OUTPUT = $02
+        VIA_BC_PA_DISKSIDE1     = $04
+        VIA_BC_PA_2MHZ          = $20
+        VIA_BC_PA_BYTEREADY     = $80
+
+        PP_DATA    = CIA_PB
+        PP_DDR     = CIA_DDRB
 
 .elseif .defined(Drive1581)
 
-        IEC_PORT   = $4001
+        CIA_BASE   = $4000
+        CIA_PA     = CIA_BASE
+        CIA_PB     = CIA_BASE+1
+        CIA_DDRA   = CIA_BASE+2
+        CIA_DDRB   = CIA_BASE+3
+        CIA_TA_LO  = CIA_BASE+4
+        CIA_TA_HI  = CIA_BASE+5
+        CIA_SDR    = CIA_BASE+$c
+        CIA_ICR    = CIA_BASE+$d
+        CIA_CRA    = CIA_BASE+$e
+
+        IEC_PORT   = CIA_PB
 
 .else
 

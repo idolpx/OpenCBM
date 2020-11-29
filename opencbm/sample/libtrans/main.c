@@ -108,6 +108,10 @@ processParameter(const int argc, char ** argv)
                 {
                     libopencbmtransfer_set_transfer(opencbm_transfer_parallel);
                 }
+                else if (strcmp(&argv[i][2], "srq") == 0)
+                {
+                    libopencbmtransfer_set_transfer(opencbm_transfer_srq_handshaked);
+                }
                 else
                 {
                     printf("unknown transfer protocol '%s'\n", &argv[i][2]);

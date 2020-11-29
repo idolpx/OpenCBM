@@ -1,0 +1,214 @@
+; Copyright      2020 Spiro Trikaliotis
+; All rights reserved.
+;
+; This file is part of OpenCBM
+;
+;  This program is free software; you can redistribute it and/or
+;  modify it under the terms of the GNU General Public License
+;  as published by the Free Software Foundation; either version
+;  2 of the License, or (at your option) any later version.
+
+
+.if .defined(Drive1541)
+.else
+        Drive1571       = 1                     ;Compile for 1571 drives
+.endif
+
+        .include "common.i65"
+
+        * = $0700
+
+clklo = $e9ae
+clkhi = $e9b7
+datalo = $e9a5
+datahi = $e99c
+get_iec = $e9c0
+
+setinput = $81b2
+setoutput = $81ce
+
+timer_counter = 1
+
+get_ts     jmp gts         ; get track/sector
+get_byte   jmp gbyte       ; get byte
+get_block  jmp gblk        ; receive block
+send_byte  jmp sbyte       ; send byte
+send_block jmp sblk        ; send block
+
+init
+
+	; set 2 MHz
+	lda VIA_BC_PA_NOHANDSHAKE
+	ora #VIA_BC_PA_2MHZ	; 2 MHz mode
+	sta VIA_BC_PA_NOHANDSHAKE
+
+	lda #$7f
+	sta CIA_ICR
+
+	; set timer
+	lda #>timer_counter
+	ldx #<timer_counter
+	sta CIA_TA_HI
+	stx CIA_TA_LO
+
+	jsr setinput
+
+	jmp datahi	; signal: we are ready
+; --------------------------------------------
+
+sblk
+	sei
+:
+	lda (ptr),y
+	jsr sbyte
+	iny
+	bne :-
+	cli
+	rts
+
+sbyte
+	pha
+	jsr wait_atn_set
+	jsr setoutput
+	pla
+	sta CIA_SDR			; send it back (echo)
+
+	jsr wait_srq_transfer_end
+
+	jsr wait_atn_clear
+	jsr setinput
+
+	rts
+
+; ----------------------
+
+wait_atn_set
+	; wait for controller signalling 'ready to transfer' by setting ATN
+	jsr get_iec
+	and #IEC_PORT_ATN_IN
+	beq wait_atn_set
+
+	bit CIA_ICR	; clear transfer flag
+
+	; clear ATNA ( =DATA), set CLK to signal we are ready to receive
+	lda IEC_PORT
+	ora #IEC_PORT_ATNA_OUT | IEC_PORT_CLK_OUT
+	sta IEC_PORT
+
+	rts
+
+wait_atn_clear
+	; wait for controller signalling 'transfer finished' by clearing ATN
+	jsr get_iec
+	and #IEC_PORT_ATN_IN
+	bne wait_atn_clear
+
+	; clear ATNA ( = DATA), clear CLK to signal we are not ready to receive
+	lda IEC_PORT
+	and # ~ (IEC_PORT_ATNA_OUT | IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT) & $FF
+	sta IEC_PORT
+
+	rts
+
+wait_srq_transfer_end:
+	; wait for transfer to finish
+	lda #8
+:	bit CIA_ICR
+	beq :-
+	jmp clkhi
+	; ------------------------
+
+gbyte
+	jsr wait_atn_set
+	jsr wait_srq_transfer_end
+	jsr wait_atn_clear
+
+	lda CIA_SDR			; get data byte
+	rts
+
+gts
+	jsr gbyte
+	tax
+	jsr gbyte
+	tay
+	rts
+
+gblk
+	sei
+:
+	jsr gbyte
+	sta (ptr),y
+	iny
+	bne :-
+	cli
+	rts
+
+
+set_data_clk
+;	jsr clklo
+;	jmp datalo
+
+	lda IEC_PORT
+	ora #IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT
+;	bne clr_data_clk_store
+	sta IEC_PORT
+	rts
+
+clr_data_clk
+;	jsr clkhi
+;	jmp datahi
+	lda IEC_PORT
+	and # ~ (IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT) + $100
+;clr_data_clk_store
+	sta IEC_PORT
+	rts
+
+;blink
+;;	ldy #10
+;
+;:
+;	jsr delay
+;
+;	jsr set_data_clk
+;	jsr delay
+;
+;	jsr clr_data_clk
+;
+;	dex
+;	bne :-
+;
+;	jsr delay
+;
+;	; fall through
+;
+;delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jsr $a483	; 70 us delay
+;	jmp $a483	; 70 us delay
+;
+;transfertest
+;
+;	ldy #3
+;
+;sendloop
+;	sty CIA_SDR
+;
+;	lda #8
+;:	bit CIA_ICR
+;	beq :-
+;
+;	jsr delay
+;
+;	dey
+;	bne sendloop
+;
+;	jsr delay
+;
+;	rts
