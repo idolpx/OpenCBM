@@ -54,30 +54,37 @@ init
 	jsr setinput
 
 	jmp datahi	; signal: we are ready
+
 ; --------------------------------------------
 
 sblk
 	sei
 :
 	lda (ptr),y
-	jsr sbyte
+	jsr sbyte_int
 	iny
 	bne :-
 	cli
 	rts
 
-sbyte
+sbyte_int
 	pha
 	jsr wait_atn_set
 	jsr setoutput
 	pla
-	sta CIA_SDR			; send it back (echo)
+	sta CIA_SDR
 
 	jsr wait_srq_transfer_end
 
 	jsr wait_atn_clear
 	jsr setinput
 
+	rts
+
+sbyte
+	sei
+	jsr sbyte_int
+	cli
 	rts
 
 ; ----------------------
@@ -119,6 +126,12 @@ wait_srq_transfer_end:
 	; ------------------------
 
 gbyte
+	sei
+	jsr gbyte_int
+	cli
+	rts
+
+gbyte_int
 	jsr wait_atn_set
 	jsr wait_srq_transfer_end
 	jsr wait_atn_clear
@@ -127,16 +140,18 @@ gbyte
 	rts
 
 gts
-	jsr gbyte
+	sei
+	jsr gbyte_int
 	tax
-	jsr gbyte
+	jsr gbyte_int
 	tay
+	cli
 	rts
 
 gblk
 	sei
 :
-	jsr gbyte
+	jsr gbyte_int
 	sta (ptr),y
 	iny
 	bne :-
@@ -145,70 +160,13 @@ gblk
 
 
 set_data_clk
-;	jsr clklo
-;	jmp datalo
-
 	lda IEC_PORT
 	ora #IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT
-;	bne clr_data_clk_store
 	sta IEC_PORT
 	rts
 
 clr_data_clk
-;	jsr clkhi
-;	jmp datahi
 	lda IEC_PORT
 	and # ~ (IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT) + $100
-;clr_data_clk_store
 	sta IEC_PORT
 	rts
-
-;blink
-;;	ldy #10
-;
-;:
-;	jsr delay
-;
-;	jsr set_data_clk
-;	jsr delay
-;
-;	jsr clr_data_clk
-;
-;	dex
-;	bne :-
-;
-;	jsr delay
-;
-;	; fall through
-;
-;delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jsr $a483	; 70 us delay
-;	jmp $a483	; 70 us delay
-;
-;transfertest
-;
-;	ldy #3
-;
-;sendloop
-;	sty CIA_SDR
-;
-;	lda #8
-;:	bit CIA_ICR
-;	beq :-
-;
-;	jsr delay
-;
-;	dey
-;	bne sendloop
-;
-;	jsr delay
-;
-;	rts
