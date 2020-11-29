@@ -120,9 +120,7 @@ libopencbmtransfer_install(CBM_FILE HandleDevice, unsigned char DeviceAddress)
             error = 1;
         }
 
-        //printf("wait...\n");
         current_transfer_funcs->init(HandleDevice, DeviceAddress);
-        //printf("... end\n");
     }
 
     FUNC_LEAVE_INT(error);
@@ -149,15 +147,19 @@ static int
 libopencbmtransfer_ll_write_mem(CBM_FILE HandleDevice, unsigned char DeviceAddress,
                                 unsigned char Buffer[], unsigned int MemoryAddress, unsigned int Length)
 {
+    unsigned char ConvertedLength = 0x100u - Length;
+
     FUNC_ENTER();
 
     DBG_ASSERT(Length < 0x100);
+
+    MemoryAddress -= ConvertedLength;
 
     current_transfer_funcs->write1byte(HandleDevice, 0x00);
     current_transfer_funcs->write2byte(HandleDevice,
         (unsigned char) (MemoryAddress & 0xFF),
         (unsigned char) (MemoryAddress >> 8));
-    current_transfer_funcs->write1byte(HandleDevice, (unsigned char) Length);
+    current_transfer_funcs->write1byte(HandleDevice, ConvertedLength);
     current_transfer_funcs->writeblock(HandleDevice, Buffer, Length);
 
     FUNC_LEAVE_INT(0);
@@ -168,15 +170,19 @@ static int
 libopencbmtransfer_ll_read_mem(CBM_FILE HandleDevice, unsigned char DeviceAddress,
                                unsigned char Buffer[], unsigned int MemoryAddress, unsigned int Length)
 {
+    unsigned char ConvertedLength = 0x100u - Length;
+
     FUNC_ENTER();
 
     DBG_ASSERT(Length < 0x100);
+
+    MemoryAddress -= ConvertedLength;
 
     current_transfer_funcs->write1byte(HandleDevice, 0x01);
     current_transfer_funcs->write2byte(HandleDevice,
         (unsigned char) (MemoryAddress & 0xFF),
         (unsigned char) (MemoryAddress >> 8));
-    current_transfer_funcs->write1byte(HandleDevice, (unsigned char) Length);
+    current_transfer_funcs->write1byte(HandleDevice, ConvertedLength);
     current_transfer_funcs->readblock(HandleDevice, Buffer, Length);
 
     FUNC_LEAVE_INT(0);
@@ -188,32 +194,30 @@ libopencbmtransfer_read_write_mem(CBM_FILE HandleDevice, unsigned char DeviceAdd
                                   ll_read_write_mem function)
 {
     const static char monkey[]={",oO*^!:;"};// for fast moves
+    const unsigned int max_transfer_length = 0x100;
 
     FUNC_ENTER();
 
     // If we have to transfer more than one page, process the complete pages first
                                                                         SETSTATEDEBUG(DebugBlockCount = 0);
-    while (Length >= 0x100)
+    while (Length >= max_transfer_length)
     {
         int c = (Length >> 8) % (sizeof(monkey) - 1);
         fprintf(stderr, (c != 0) ? "\b%c" : "\b.%c" , monkey[c]);
-        fflush(stderr);
 
                                                                         SETSTATEDEBUG(DebugBlockCount++);
-        function(HandleDevice, DeviceAddress, Buffer, MemoryAddress, 0x00);
+        function(HandleDevice, DeviceAddress, Buffer, MemoryAddress, max_transfer_length & 0xFFu);
 
-        Buffer += 0x100;
-        MemoryAddress += 0x100;
-        Length -= 0x100;
+        Buffer += max_transfer_length;
+        MemoryAddress += max_transfer_length;
+        Length -= max_transfer_length;
     }
 
     if (Length > 0)
     {
-        unsigned int remainder = 0x100 - Length;
+        unsigned int remainder = max_transfer_length - Length;
                                                                         SETSTATEDEBUG(DebugBlockCount++);
-        //fprintf(stderr, "."); fflush(stderr);
         fprintf(stderr, "\010.");
-        fflush(stderr);
         function(HandleDevice, DeviceAddress, Buffer, MemoryAddress - remainder, remainder);
     }
                                                                         SETSTATEDEBUG(DebugBlockCount = -1);
