@@ -30,7 +30,7 @@
 #include "debug.h"
 
 static int startaddress = 0x8000;
-static int transferlength = 0x110;
+static int transferlength = 0x8000;
 static int writedumpfile = 0;
 static int outputdump = 0;
 static int compare = 0;
@@ -258,6 +258,8 @@ main_testtransfer(int argc, char **argv)
 #else
     while (count--)
     {
+        memset(buffer, 0, sizeof(buffer));
+
         printf("read:  %i, error = %u: \n", count+1, error);
         libopencbmtransfer_read_mem(fd, drive, buffer, startaddress, transferlength);
         if (compare)
