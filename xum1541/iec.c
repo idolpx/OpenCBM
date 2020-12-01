@@ -176,7 +176,11 @@ static void
 iec_reset(bool forever)
 {
     DEBUGF(DBG_ALL, "reset\n");
+#ifdef IO_SRQ
+    iec_release(IO_DATA | IO_ATN | IO_CLK | IO_SRQ);
+#else
     iec_release(IO_DATA | IO_ATN | IO_CLK);
+#endif
 
     /*
      * Hold the device in reset a while. 20 ms was too short and it didn't
