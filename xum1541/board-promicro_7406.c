@@ -64,14 +64,14 @@ board_init_iec(void)
 {
     // IO port initialization
 
+    IEC_B_PORT = 0;
     IEC_B_DDR  = IEC_B_MASK;
-    IEC_B_PORT = IEC_B_MASK;
 
+    IEC_C_PORT = 0;
     IEC_C_DDR  = IEC_C_MASK;
-    IEC_C_PORT = IEC_C_MASK;
 
+    IEC_E_PORT = 0;
     IEC_E_DDR  = IEC_E_MASK;
-    IEC_E_PORT = IEC_E_MASK;
 
   /* make port(s) input */
   PAR_PORT0_DDR &= ~PAR_PORT0_MASK;
