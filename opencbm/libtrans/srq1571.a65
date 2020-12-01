@@ -167,6 +167,6 @@ set_data_clk
 
 clr_data_clk
 	lda IEC_PORT
-	and # ~ (IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT) + $100
+	and # ~ (IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT) & $FF
 	sta IEC_PORT
 	rts
