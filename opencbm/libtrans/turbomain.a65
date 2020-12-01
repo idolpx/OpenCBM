@@ -62,6 +62,7 @@ readmem:
 
 execute_cmd:
         jsr ts
+        cli
         jmp (ptr)
 
         ; Init transfer routine
@@ -123,11 +124,13 @@ ts:
 
 .ifdef DefFlipLed
 flipled:
+        php
         pha
         lda #8
         eor $1c00
         sta $1c00
         pla
+        plp
         rts
 
 delay1:
