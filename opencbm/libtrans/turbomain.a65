@@ -53,17 +53,19 @@ CMD_WRITEMEM = $0
 get_ts = $0700
 get_byte = $0703
 get_block = $0706
+;send_byte = $0709 ; @@@ unused for the moment
 send_block = $070c
 init = $070f
-
-readmem:
-        jsr send_block
-        beq start       ; uncond
 
 execute_cmd:
         jsr ts
         cli
         jmp (ptr)
+
+readmem:
+        jsr send_block
+;        beq start       ; uncond
+	; FALL THROUGH
 
         ; Init transfer routine
 start:

@@ -107,6 +107,7 @@ read2byte(CBM_FILE fd, unsigned char *c1, unsigned char *c2)
 static int
 readblock(CBM_FILE fd, unsigned char *p, unsigned int length)
 {
+#ifdef USE_HANDSHAKED_READ_BLOCK
                                                                         SETSTATEDEBUG(DebugByteCount = 0);
     for (; length < 0x100; length++)
     {
@@ -116,6 +117,9 @@ readblock(CBM_FILE fd, unsigned char *p, unsigned int length)
                                                                         SETSTATEDEBUG(DebugByteCount = -1);
                                                                         SETSTATEDEBUG((void)0);
     return 0;
+#else
+    return cbm_srq_burst_read_track(fd, p, 0x100 - length);
+#endif
 }
 
 static int

@@ -59,33 +59,67 @@ init
 
 sblk
 	sei
+
+	jsr setoutput
+
+	jsr sbyte	; dummy send, needed by NIB protocol
+	jsr datahi
+
+	; wait for controller signalling 'ready to transfer' by setting CLK
+:	jsr get_iec
+	and #IEC_PORT_CLK_IN
+	beq :-
+
+	jsr setoutput
+
 :
+;	; check if controller signals 'end of transfer' by releasing CLK
+;	jsr get_iec
+;	and #IEC_PORT_CLK_IN
+;	beq sblk_abort
+
 	lda (ptr),y
 	jsr sbyte_int
 	iny
 	bne :-
+
+	jsr sbyte	; dummy send, needed by NIB protocol
+
+	; wait for controller signalling 'end of transfer' by releasing CLK
+:	jsr get_iec
+	and #IEC_PORT_CLK_IN
+	bne :-
+
+sblk_abort:
 	cli
-	rts
+	jmp setinput
 
 sbyte_int
-	pha
-	jsr wait_atn_set
-	jsr setoutput
-	pla
 	sta CIA_SDR
+	; FALL THROUGH
 
-	jsr wait_srq_transfer_end
+wait_srq_transfer_end:
+	; wait for transfer to finish
+	lda #8
+:	bit CIA_ICR
+	beq :-
+	jmp clkhi
+	; ------------------------
 
-	jsr wait_atn_clear
-	jsr setinput
-
-	rts
 
 sbyte
 	sei
+
+	tax
+	jsr wait_atn_set
+	jsr setoutput
+	txa
+
 	jsr sbyte_int
+
+	jsr wait_atn_clear
 	cli
-	rts
+	jmp setinput
 
 ; ----------------------
 
@@ -116,14 +150,6 @@ wait_atn_clear
 	sta IEC_PORT
 
 	rts
-
-wait_srq_transfer_end:
-	; wait for transfer to finish
-	lda #8
-:	bit CIA_ICR
-	beq :-
-	jmp clkhi
-	; ------------------------
 
 gbyte
 	sei
@@ -156,17 +182,4 @@ gblk
 	iny
 	bne :-
 	cli
-	rts
-
-
-set_data_clk
-	lda IEC_PORT
-	ora #IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT
-	sta IEC_PORT
-	rts
-
-clr_data_clk
-	lda IEC_PORT
-	and # ~ (IEC_PORT_CLK_OUT | IEC_PORT_DATA_OUT) & $FF
-	sta IEC_PORT
 	rts
