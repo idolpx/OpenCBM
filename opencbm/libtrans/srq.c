@@ -146,6 +146,7 @@ write2byte(CBM_FILE fd, unsigned char c1, unsigned char c2)
 static int
 writeblock(CBM_FILE fd, unsigned char *p, unsigned int length)
 {
+#ifdef USE_HANDSHAKED_WRITE_BLOCK
                                                                         SETSTATEDEBUG(DebugByteCount = 0);
     for (; length < 0x100; ++length)
     {
@@ -155,6 +156,9 @@ writeblock(CBM_FILE fd, unsigned char *p, unsigned int length)
 
                                                                         SETSTATEDEBUG(DebugByteCount = -1);
     return 0;
+#else
+    return cbm_srq_burst_write_track(fd, p, 0x100 + length);
+#endif
 }
 
 DECLARE_TRANSFER_FUNCS(srq);

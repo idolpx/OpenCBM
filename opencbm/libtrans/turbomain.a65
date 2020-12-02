@@ -101,7 +101,7 @@ cmpnext lda (ptr),y
         iny
         bne cmpnext
 .endif
-        beq start       ; uncond
+        jmp start
 
 .ifdef DefTestWriteMem
 error:

@@ -174,12 +174,24 @@ gts
 	cli
 	rts
 
+
 gblk
 	sei
+
 :
-	jsr gbyte_int
+	jsr wait_srq_transfer_end
+	lda CIA_SDR			; get data byte
 	sta (ptr),y
+
+	lda IEC_PORT
+	eor #IEC_PORT_CLK_OUT
+	sta IEC_PORT
+
 	iny
 	bne :-
+
+	lda #$55
+	jsr sbyte	; dummy send, needed by NIB protocol
+
 	cli
 	rts
