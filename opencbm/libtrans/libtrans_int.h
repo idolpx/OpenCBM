@@ -114,6 +114,7 @@ typedef struct {
 extern transfer_funcs libopencbmtransfer_s1;
 extern transfer_funcs libopencbmtransfer_s2;
 extern transfer_funcs libopencbmtransfer_srq;
+extern transfer_funcs libopencbmtransfer_srq_handshaked;
 extern transfer_funcs libopencbmtransfer_pp;
 
 #endif /* #ifndef LIBTRANS_INT_H */

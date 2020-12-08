@@ -10,12 +10,14 @@ SRCS    = pp.c \
 	  s1.c \
 	  s2.c \
 	  srq.c \
+	  srq-hs.c \
 	  turbo.c
 
 INCS    = pp1541.inc \
 	  pp1571.inc \
 	  s1.inc \
 	  s2.inc \
+	  srq-hs-1571.inc \
 	  srq1571.inc \
           turbomain.inc
 
@@ -48,6 +50,8 @@ s2.lo: s2.c s2.inc
 pp.lo: pp.c pp1541.inc pp1571.inc
 
 srq.lo: srq.c srq1571.inc
+
+srq-hs.lo: srq-hs.c srq-hs-1571.inc
 
 turbo.lo: turbomain.inc
 

@@ -110,6 +110,10 @@ processParameter(const int argc, char ** argv)
                 }
                 else if (strcmp(&argv[i][2], "srq") == 0)
                 {
+                    libopencbmtransfer_set_transfer(opencbm_transfer_srq);
+                }
+                else if (strcmp(&argv[i][2], "srq_hs") == 0)
+                {
                     libopencbmtransfer_set_transfer(opencbm_transfer_srq_handshaked);
                 }
                 else
