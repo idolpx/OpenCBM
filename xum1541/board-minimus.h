@@ -36,7 +36,7 @@ void board_init_iec(void);
 // Pins: 3, 2, RXI, TXO, A3, A2, A1, A0 make a Parallel Port
 // in that order, coressponding to D0 - D7
 
-#define PAR_PORT0_MASK   0xf0   /* port F pins 4-7 */
+#define PAR_PORT0_MASK   0xf0   /* port C pins 4-7 */
 #define PAR_PORT0_DDR    DDRC
 #define PAR_PORT0_PIN    PINC
 #define PAR_PORT0_PORT   PORTC
