@@ -7,6 +7,8 @@
  *  Copyright 1999 Michael Klein <michael(dot)klein(at)puffin(dot)lb(dot)shuttle(dot)de>
 */
 
+#define _POSIX_C_SOURCE 200112L
+
 #include "opencbm.h"
 
 #include <ctype.h>
