@@ -61,16 +61,16 @@ void
 board_init_iec(void)
 {
     // IO port initialization
-    IEC_DDR  = 0;
-    IEC_PORT = 0;
+    IEC_DDR  = 0xFF;
+    IEC_PORT = 0xFF;
 
-  /* make port(s) input */
-  PAR_PORT0_DDR &= ~PAR_PORT0_MASK;
-  PAR_PORT1_DDR &= ~PAR_PORT1_MASK;
+    /* make port(s) input */
+    PAR_PORT0_DDR &= ~PAR_PORT0_MASK;
+    PAR_PORT1_DDR &= ~PAR_PORT1_MASK;
 
-  /* disable pullups */
-  PAR_PORT0_PORT &= ~PAR_PORT0_MASK;
-  PAR_PORT1_PORT &= ~PAR_PORT1_MASK;
+    /* disable pullups */
+    PAR_PORT0_PORT &= ~PAR_PORT0_MASK;
+    PAR_PORT1_PORT &= ~PAR_PORT1_MASK;
 }
 
 uint8_t
@@ -105,7 +105,7 @@ board_update_display(uint8_t status)
     }
 }
 
-/* 
+/*
  * Signal that the board_update_display() should be called if the timer
  * has fired (every ~100 ms).
  */

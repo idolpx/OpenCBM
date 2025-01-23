@@ -38,8 +38,6 @@ EXTERN opencbm_plugin_raw_read_t                   opencbm_plugin_raw_read;
 EXTERN opencbm_plugin_listen_t                     opencbm_plugin_listen;
 EXTERN opencbm_plugin_talk_t                       opencbm_plugin_talk;
 EXTERN opencbm_plugin_open_t                       opencbm_plugin_open;
-EXTERN opencbm_plugin_unlisten_t                   opencbm_plugin_unlisten;
-EXTERN opencbm_plugin_untalk_t                     opencbm_plugin_untalk;
 EXTERN opencbm_plugin_close_t                      opencbm_plugin_close;
 EXTERN opencbm_plugin_unlisten_t                   opencbm_plugin_unlisten;
 EXTERN opencbm_plugin_untalk_t                     opencbm_plugin_untalk;
