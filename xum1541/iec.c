@@ -444,9 +444,9 @@ iec_raw_write(uint16_t len, uint8_t flags)
                 }
             }
         } else {
-            // If UNTALK or UNLISTEN then release clock
+            // If UNTALK or UNLISTEN then release ATN & CLK
             if (atn && (data == 0x3f || data == 0x5f)) {
-                iec_release(IO_CLK | IO_ATN);
+                iec_release(IO_ATN | IO_CLK);
             }
             else
             {
@@ -461,7 +461,7 @@ iec_raw_write(uint16_t len, uint8_t flags)
          * if send_byte() succeeded and not in this error case.
          */
         DELAY_US(IEC_T_R);
-        iec_release(IO_CLK | IO_ATN);
+        iec_release(IO_ATN | IO_CLK | IO_DATA);
     }
 
 
