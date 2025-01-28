@@ -514,7 +514,8 @@ int ARCH_MAINDECL main(int argc, char **argv)
                             strcpy(tail, ",W");
 
                             /* convert result to ASCII for display */
-                            tail = arch_strdup(buf);
+                            //tail = arch_strdup(buf);
+                            tail = cbmlibmisc_strdup(buf);
                             /* use buf as fallback if allocation failed */
                             if(tail) cbm_petscii2ascii(tail);
                             else tail = buf;
@@ -579,7 +580,8 @@ int ARCH_MAINDECL main(int argc, char **argv)
 
                 if(output_name)
                 {
-                    fs_name = arch_strdup(output_name);
+                    //fs_name = arch_strdup(output_name);
+                    fs_name = cbmlibmisc_strdup(output_name);
                 }
                 else
                 {

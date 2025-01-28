@@ -1042,13 +1042,16 @@ static int do_command(CBM_FILE fd, OPTIONS * const options)
     if(rv == 0)
     {
         if (commandlinelen > 0)
+        {
+            cbm_ascii2petscii(commandline);
             cbm_raw_write(fd, commandline, commandlinelen);
+        }
 
         // make sure the buffer is ended with a '\r'; this is needed
         // only if the command ends with a '\r', to work around a bug
         // in the floppy code.
 
-        cbm_raw_write(fd, "\r", 1);
+        //cbm_raw_write(fd, "\r", 1);
 
         rv = cbm_unlisten(fd);
     }
@@ -1150,7 +1153,7 @@ static int do_dir(CBM_FILE fd, OPTIONS * const options)
 
 static void show_monkey(unsigned int c)
 {
-    // const static char monkey[]={"¸,ø¤*º°´`°º*¤ø,¸"};     // for fast moves
+    // const static char monkey[]={"ï¿½,ï¿½ï¿½*ï¿½ï¿½ï¿½`ï¿½ï¿½*ï¿½ï¿½,ï¿½"};     // for fast moves
     // const static char monkey[]={"\\|/-"};    // from cbmcopy
     // const static char monkey[]={"-\\|/"};    // from libtrans (reversed)
     // const static char monkey[]={"\\-/|"};    // from cbmcopy  (reversed)

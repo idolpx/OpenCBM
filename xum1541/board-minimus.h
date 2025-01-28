@@ -7,6 +7,37 @@
  * as published by the Free Software Foundation; either version
  * 2 of the License, or (at your option) any later version.
  */
+
+//
+// See https://jamie.lentin.co.uk/embedded/minimus/
+//
+// The board comes with most pins on the chip broken out along either side, at a standard 0.1" pitch.
+// The labelling on the boards can be hard to read, and there is no labelling as to how the LEDs and switch are wired.
+// To the chip the board looks like this:
+//
+// -----------------------------------------------------
+// |   VCC PC4 PC5 RST PC6 PC7 PB7 PB6 PB5 PB4 PB3 PB2 |
+// |                                                   |
+// U                                              PWR  |
+// S P                                                 |
+// B O   [ ] 5V                 RST - RST     A - PD6  |
+// | R   [ ]                                           |
+// | T   [ ] 3.3V               HWB - PD7     B - PD5  |
+// |                                                   |
+// |   PC2 PD0 PD1 PD2 PD3 PD4 PD5 PD6 PD7 PB0 PB1 GND |
+// -----------------------------------------------------
+// i.e. PD5 & PD6 are also the on board LEDS, PD7 is the HWB button.
+//
+// By default it uses 5v I/O (Including VCC), but there's a built-in 50mA regulator for 3.3v I/O.
+// To make the switch...
+// 1. Cut bridge between 5v pad and centre pad
+// 2. Solder bridge between 3.3v pad and centre pad
+// To use an external 5v power source, chop the USB connector pin and apply power directly to VCC.
+// To use an external 3.3v power source, also bridge all 3 power configuration pads and disable the on-board regulator:
+//
+// REGCR |= (1 << REGDIS);  // Disable regulator
+//
+
 #ifndef _BOARD_MINIMUS_H
 #define _BOARD_MINIMUS_H
 
@@ -36,7 +67,7 @@ void board_init_iec(void);
 // Pins: 3, 2, RXI, TXO, A3, A2, A1, A0 make a Parallel Port
 // in that order, coressponding to D0 - D7
 
-#define PAR_PORT0_MASK   0xf0   /* port F pins 4-7 */
+#define PAR_PORT0_MASK   0xf0   /* port C pins 4-7 */
 #define PAR_PORT0_DDR    DDRC
 #define PAR_PORT0_PIN    PINC
 #define PAR_PORT0_PORT   PORTC

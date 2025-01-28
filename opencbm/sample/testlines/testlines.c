@@ -7,6 +7,8 @@
  *  Copyright 2018 Spiro Trikaliotis
  */
 
+#define _POSIX_C_SOURCE 200112L
+
 #include "opencbm.h"
 
 #include <stdio.h>
@@ -972,7 +974,7 @@ static int do_dir(CBM_FILE fd, OPTIONS * const options)
 
 static void show_monkey(unsigned int c)
 {
-    // const static char monkey[]={"¸,ø¤*º°´`°º*¤ø,¸"};     // for fast moves
+    // const static char monkey[]={"ï¿½,ï¿½ï¿½*ï¿½ï¿½ï¿½`ï¿½ï¿½*ï¿½ï¿½,ï¿½"};     // for fast moves
     // const static char monkey[]={"\\|/-"};    // from cbmcopy
     // const static char monkey[]={"-\\|/"};    // from libtrans (reversed)
     // const static char monkey[]={"\\-/|"};    // from cbmcopy  (reversed)

@@ -20,6 +20,8 @@
 ** \brief libusb-based xum1541 access routines
 ****************************************************************/
 
+#define _POSIX_C_SOURCE 200112L
+
 // This XUM1541 plugin has tape support.
 #define TAPE_SUPPORT 1
 
