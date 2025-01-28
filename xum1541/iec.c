@@ -24,7 +24,9 @@
 //      IEC_T_H     inf  // Max listener hold-off time
 #define IEC_T_NE    40   // Typical non-EOI response to RFD time (us)
 #define IEC_T_S     20   // Min talker bit setup time (us, 70 typical)
-#define IEC_T_V     20   // Min data valid time (us, 20 typical)
+#define IEC_T_S0    45
+#define IEC_T_S1    25
+#define IEC_T_V     25   // Min data valid time (us, 20 typical)
 #define IEC_T_F     1000 // Max frame handshake time (us, 20 typical)
 #define IEC_T_R     20   // Min frame to release of ATN time (us)
 #define IEC_T_BB    100  // Min time between bytes (us)
@@ -263,14 +265,15 @@ send_byte(uint8_t b)
     uint8_t i, ack = 0;
 
     for (i = 8; i != 0; i--) {
+
         // Wait for Ts (setup) with additional padding
-        DELAY_US(IEC_T_S + 55);
+        DELAY_US(IEC_T_S0);
 
         // Set the bit value on the DATA line and wait for it to settle.
-        if (!(b & 1)) {
-            iec_set(IO_DATA);
-            IEC_DELAY();
-        }
+        if (b & 1) iec_set(IO_DATA);
+
+        // Wait for Ts (setup) with additional padding
+        DELAY_US(IEC_T_S1);
 
         // Trigger clock edge and hold valid for spec minimum time (Tv).
         iec_release(IO_CLK);
@@ -440,8 +443,16 @@ iec_raw_write(uint16_t len, uint8_t flags)
                     break;
                 }
             }
-        } else
-            iec_release(IO_ATN);
+        } else {
+            // If UNTALK or UNLISTEN then release clock
+            if (atn && (data == 0x3f || data == 0x5f)) {
+                iec_release(IO_CLK | IO_ATN);
+            }
+            else
+            {
+                iec_release(IO_ATN);
+            }
+        }
     } else {
         /*
          * If there was an error, release all lines before returning.
@@ -452,6 +463,7 @@ iec_raw_write(uint16_t len, uint8_t flags)
         DELAY_US(IEC_T_R);
         iec_release(IO_CLK | IO_ATN);
     }
+
 
     DEBUGF(DBG_INFO, "wrv=%d\n", rv);
     return rv;
